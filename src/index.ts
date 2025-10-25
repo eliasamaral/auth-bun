@@ -1,7 +1,44 @@
-import { Elysia } from "elysia";
+import { Elysia } from 'elysia'
+import { openapi } from '@elysiajs/openapi'
+import * as z from 'zod'
+import { betterAuthPlugin, OpenAPI } from './http/plugins/better-auth'
 
-const app = new Elysia().get("/", () => "Hello Elysia").listen(3000);
+const app = new Elysia()
+	.use(openapi({
+    mapJsonSchema: { zod: z.toJSONSchema},
+    documentation: {
+        components: await OpenAPI.components,
+        paths: await OpenAPI.getPaths()
+      }
+    }))
+	.use(betterAuthPlugin)
+	.get('/', () => {
+ return 'Hello World'
+	})
+	.get('/users/:id', ({ params, user }) => {
+	  const userId = params.id
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+		const authenticateUserName = user.name
+		console.log(authenticateUserName)
+
+		return { id: '1', name: 'Elias Amaral' }
+		},
+		{
+      auth: true,
+			detail: {
+				summary: 'Busca um usuário pelo id',
+				tags: ['users'],
+			},
+			params: z.object({
+				id: z.string(),
+			}),
+			response: {
+				200: z.object({
+					id: z.string(),
+					name: z.string(),
+				}),
+			},
+		},
+	)
+	.listen(3333)
+    console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`)
