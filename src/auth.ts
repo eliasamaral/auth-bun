@@ -1,39 +1,39 @@
-import { betterAuth } from 'better-auth'
-import { organization } from 'better-auth/plugins'
-import { drizzleAdapter } from 'better-auth/adapters/drizzle'
-import { openAPI } from 'better-auth/plugins'
-import { db } from './db/client'
+import { betterAuth } from "better-auth";
+import { organization } from "better-auth/plugins";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { openAPI } from "better-auth/plugins";
+import { db } from "./db/client";
 
 export const auth = betterAuth({
-	basePath: '/auth',
-	plugins: [openAPI(), organization()],
-	database: drizzleAdapter(db, {
-		provider: 'pg',
-		usePlural: true,
-		camelCase: false,
-	}),
-	emailAndPassword: {
-		enabled: true,
-		autoSignIn: true,
-		password: {
-			hash: (password: string) => Bun.password.hash(password),
-			verify: ({ password, hash }) => Bun.password.verify(password, hash),
-		},
-	},
-	session: {
-		expiresIn: 60 * 60 * 24 * 7,
-		cookieCache: {
-			enabled: true,
-			maxAge: 60 * 5,
-		},
-	},
-	trustedOrigins: ['http://localhost:3333'],
-	// Descomentar quando trocar a tipagem do id nos schemas
-	// para usar id: uuid("id").primaryKey().$defaultFn(() => randomUUIDv7())
-	//
-	// advanced: {
-	//   database: {
-	//     generateId: false
-	//   },
-	// }
-})
+    basePath: "/auth",
+    trustedOrigins: ["http://localhost:5173"],
+    plugins: [openAPI(), organization()],
+    database: drizzleAdapter(db, {
+        provider: "pg",
+        usePlural: true,
+        camelCase: false,
+    }),
+    emailAndPassword: {
+        enabled: true,
+        autoSignIn: true,
+        password: {
+            hash: (password: string) => Bun.password.hash(password),
+            verify: ({ password, hash }) => Bun.password.verify(password, hash),
+        },
+    },
+    session: {
+        expiresIn: 60 * 60 * 24 * 7,
+        cookieCache: {
+            enabled: true,
+            maxAge: 60 * 5,
+        },
+    },
+    // Descomentar quando trocar a tipagem do id nos schemas
+    // para usar id: uuid("id").primaryKey().$defaultFn(() => randomUUIDv7())
+    //
+    // advanced: {
+    //   database: {
+    //     generateId: false
+    //   },
+    // }
+});
