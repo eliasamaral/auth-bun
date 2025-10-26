@@ -3,7 +3,15 @@ import { openapi } from '@elysiajs/openapi'
 import * as z from 'zod'
 import { betterAuthPlugin, OpenAPI } from './http/plugins/better-auth'
 
+import { cors } from '@elysiajs/cors'
+
 const app = new Elysia()
+  .use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  }))
 	.use(openapi({
     mapJsonSchema: { zod: z.toJSONSchema},
     documentation: {
